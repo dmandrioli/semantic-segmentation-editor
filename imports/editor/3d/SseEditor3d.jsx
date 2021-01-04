@@ -268,6 +268,7 @@ export default class SseEditor3d extends React.Component {
 
     deleteSelectedObject() {
         if (this.selectedObject) {
+            this.changeClassOfSelection(0);
             this.objects.delete(this.selectedObject);
             this.selectedObject = undefined;
             this.sendMsg("object-select", {value: undefined});
@@ -565,6 +566,16 @@ export default class SseEditor3d extends React.Component {
         this.camera.up.set(0, -1, 0);
 
         this.orbiter = new THREE.OrbitControls(this, this.camera, this.canvasContainer, this);
+
+        // setting up OrbitControls, see the official doc for more details
+        // https://threejs.org/docs/#examples/en/controls/OrbitControls
+        
+        // enable panning and keyboard controls
+        this.orbiter.enablePan = true;
+        this.orbiter.enableKeys = true;
+        // set pan button to null, default is RMB, but that's used for labeling
+        this.orbiter.mouseButtons = {ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: null};
+
         this.orbiter.addEventListener("start", this.orbiterStart.bind(this), false);
         this.orbiter.addEventListener("change", this.orbiterChange.bind(this), false);
         this.orbiter.addEventListener("end", this.orbiterEnd.bind(this), false);
@@ -1741,6 +1752,7 @@ export default class SseEditor3d extends React.Component {
             if (this.currentTool.mouseDown)
                 this.currentTool.mouseDown.bind(this.currentTool)(ev);
             this.sendMsg("mouse-down", ev);
+            this.invalidateCanvasMouse();
         }
     }
 

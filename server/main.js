@@ -4,6 +4,7 @@ import {basename, extname, join} from "path";
 import url from "url";
 import ColorScheme from "color-scheme";
 import config from "./config";
+const demoMode = Meteor.settings.configuration["demo-mode"];
 
 let {classes} = config;
 
@@ -123,16 +124,17 @@ Meteor.methods({
         };
 
         if (pageIndex * pageLength + pageLength < images.length) {
-            res.nextPage = `/browse/${pageIndex + 1}/${pageLength}/` + (encodeURIComponent(folder) || "");
+            res.nextPage = `/browse/${pageIndex + 1}/${pageLength}/` + (folder ? encodeURIComponent(folder) : "");
         }
         if (pageIndex > 0) {
-            res.previousPage = `/browse/${pageIndex - 1}/${pageLength}/` + (encodeURIComponent(folder) || "");
+            res.previousPage = `/browse/${pageIndex - 1}/${pageLength}/` + (folder ? encodeURIComponent(folder) : "");
         }
 
         return res;
     },
 
     'saveData'(sample) {
+        if (demoMode) return;
         const attrs = url.parse(sample.url);
         let path = decodeURIComponent(attrs.pathname);
         sample.folder = path.substring(1, path.lastIndexOf("/"));
